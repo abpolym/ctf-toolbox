@@ -143,3 +143,26 @@ def bruteforce_primes(N, e, d, xbarrier=1024, gbarrier=1024):
 				q = N/p
 				assert p*q==N
 				return p,q
+
+"""
+Perfect Squared Attack
+https://www.youtube.com/watch?v=tUUE41Gc5Q8
+
+Szenario:
+	The Modulus N is the difference of squares (perfect square). Meaning: N = a^2 - b^2 == (a-b)(a+b)
+Parameters:
+	N: Modulus
+Returns:
+	Primes p and q of Modulus N
+"""
+def perfect_square(N):
+	# Find p^2 s.t. N + p^2 = q^2. If found, then N = p^2 - q^2 => (q-p)(q+p)
+	(t, odd, i) = (None, 1, 0)
+	while i != ceil(sqrt(N)):
+		if i == 0: t = N
+		(t, odd, i) = (t+odd, odd+2, i+1)
+		if not t.is_square(): continue
+		t = sqrt(t)
+		(p, q) = (t-i, t+i)
+		assert p*q == N
+		return p,q
